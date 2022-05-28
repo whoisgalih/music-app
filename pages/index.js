@@ -1,25 +1,36 @@
+// next
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useState, useEffect } from 'react';
+
+// component
 import AppBar from '../components/app-bar';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { MusicNoteIcon, HeartIcon } from '@heroicons/react/solid';
 import menus from '../data/menus';
-import firebase from '../firebase/clientApp';
+import { MusicNoteIcon, HeartIcon } from '@heroicons/react/solid';
+
+// react
+import { useState, useEffect } from 'react';
+
+// auth
+import { useRouter } from 'next/router';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const Home = () => {
-  const [user, loading, error] = useAuthState(firebase.auth());
-
   const router = useRouter();
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-    }
-  });
+  const [user, setUser] = useState({ displayName: '' });
 
-  const name = 'Galih';
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        console.log('no user');
+        router.push('/login');
+      }
+    });
+  }, [router]);
+
   return (
     <div className='custom-margin-padding flex flex-col min-h-screen items-center'>
       <Head>
@@ -30,13 +41,15 @@ const Home = () => {
       <AppBar menus={menus} active='Home' />
       <main className='flex w-full flex-1 md:justify-center justify-end md:pt-0 pt-10 md:flex-row items custom-margin-padding flex-col-reverse'>
         <div className='md:flex-auto md:w-3/5 flex flex-col justify-center item-center flex-none md:pt-0 pt-10'>
-          <h1 className='text-6xl font-bold leading-relaxed'>
+          <h1 className='text-6xl font-bold leading-normal'>
             Remember Your Favorite{' '}
             <span className='box-decoration-slice bg-gradient-to-r from-indigo-600 to-pink-500 text-white px-4' href='https://nextjs.org'>
               Music!
             </span>
           </h1>
-          <p className='mt-5 text-2xl'>Hi {name} let&apos;s save your favorite music so you can remember your moment</p>
+          <p className='mt-5 text-2xl'>
+            Hi <span className='font-bold'>{user.displayName}</span> let&apos;s save your favorite music so you can remember your moment
+          </p>
           <div className='mt-5 sm:mt-8 sm:flex justify-start'>
             <div className='rounded-md shadow'>
               <Link href='/browse'>
