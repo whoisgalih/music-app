@@ -115,7 +115,7 @@ const Browse = () => {
       <main className='w-full custom-margin-padding'>
         <Hero title={'Browse'} />
         <div className='border-b-2'>
-          {musics.map((music) => {
+          {musics.map((music, index) => {
             return (
               <div key={music.id} className='py-4 border-t-2'>
                 <div className='flex items-center justify-between'>
@@ -124,7 +124,10 @@ const Browse = () => {
                     <h1>{music.artist}</h1>
                   </div>
                   <HeartIconOutline
-                    onClick={() => addFavorite(music.id)}
+                    onClick={() => {
+                      musics[index].favorite = !musics[index].favorite;
+                      addFavorite(music.id);
+                    }}
                     className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />
                 </div>
