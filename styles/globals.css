@@ -6,4 +6,8 @@
   .custom-margin-padding {
     @apply max-w-7xl mx-auto px-4 sm:px-6;
   }
+  
+  .custom-favorite-active {
+    @apply fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800;
+  }
 }

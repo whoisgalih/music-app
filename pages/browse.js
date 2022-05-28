@@ -8,7 +8,7 @@ import { HeartIcon as HeartIconOutline } from '@heroicons/react/outline';
 import Hero from '../components/hero';
 
 // react
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // auth
 import { useRouter } from 'next/router';
@@ -25,41 +25,47 @@ const Browse = () => {
 
   const router = useRouter();
 
-  const getData = async (_userFavId = userFavId) => {
-    const querySnapshot = await getDocs(collection(db, 'musics'));
-    const _music = [];
-    querySnapshot.forEach((doc) => {
-      _music.push({
-        id: doc.id,
-        ...doc.data(),
-      });
-    });
-
-    const fav = await getFavorite(_userFavId);
-    fav.forEach((favMusic) => {
-      _music.forEach((music) => {
-        if (music.id === favMusic) {
-          music.favorite = true;
-        }
-      });
-    });
-
-    setMusics(_music);
-  };
-
-  const getFavorite = async (_userFavId = userFavId) => {
-    try {
-      const querySnapshot = await getDocs(collection(db, _userFavId));
-      const _fav = [];
+  const getData = useCallback(
+    async (_userFavId = userFavId) => {
+      const querySnapshot = await getDocs(collection(db, 'musics'));
+      const _music = [];
       querySnapshot.forEach((doc) => {
-        _fav.push(doc.data().musicId);
+        _music.push({
+          id: doc.id,
+          ...doc.data(),
+        });
       });
-      return _fav;
-    } catch (e) {
-      console.error('Error adding document: ', e);
-      return [];
-    }
-  };
+
+      const fav = await getFavorite(_userFavId);
+      fav.forEach((favMusic) => {
+        _music.forEach((music) => {
+          if (music.id === favMusic) {
+            music.favorite = true;
+          }
+        });
+      });
+
+      setMusics(_music);
+    },
+    [userFavId, getFavorite]
+  );
+
+  const getFavorite = useCallback(
+    async (_userFavId = userFavId) => {
+      try {
+        const querySnapshot = await getDocs(collection(db, _userFavId));
+        const _fav = [];
+        querySnapshot.forEach((doc) => {
+          _fav.push(doc.data().musicId);
+        });
+        return _fav;
+      } catch (e) {
+        console.error('Error adding document: ', e);
+        return [];
+      }
+    },
+    [userFavId]
+  );
 
   const addFavorite = async (musicId, _userFavId = userFavId) => {
     try {
@@ -101,7 +107,7 @@ const Browse = () => {
         router.push('/login');
       }
     });
-  }, []);
+  }, [router, getData]);
 
   return (
     <div className='custom-margin-padding flex flex-col min-h-screen items-center'>
@@ -128,7 +134,7 @@ const Browse = () => {
                       musics[index].favorite = !musics[index].favorite;
                       addFavorite(music.id);
                     }}
-                    className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
+                    className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'custom-favorite-active' : ''}`}
                   />
                 </div>
               </div>

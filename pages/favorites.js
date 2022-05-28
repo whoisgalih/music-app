@@ -18,6 +18,7 @@ import { auth } from '../firebase';
 // db
 import { db } from '../firebase';
 import { collection, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
+import { useCallback } from 'react/cjs/react.production.min';
 
 const Favorites = () => {
   const [musics, setMusics] = useState([]);
@@ -25,41 +26,47 @@ const Favorites = () => {
 
   const router = useRouter();
 
-  const getData = async (_userFavId) => {
-    const fav = await getFavorite(_userFavId);
+  const getData = useCallback(
+    async (_userFavId = userFavId) => {
+      const fav = await getFavorite(_userFavId);
 
-    const _music = [];
+      const _music = [];
 
-    for (let index = 0; index < fav.length; index++) {
-      const favMusic = fav[index];
+      for (let index = 0; index < fav.length; index++) {
+        const favMusic = fav[index];
 
-      const docSnap = await getDoc(doc(db, 'musics', favMusic));
+        const docSnap = await getDoc(doc(db, 'musics', favMusic));
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        _music.push({ id: favMusic, ...data, favorite: true });
-        // console.log('Document data:', data);
-      } else {
-        console.log('No such document!!');
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          _music.push({ id: favMusic, ...data, favorite: true });
+          // console.log('Document data:', data);
+        } else {
+          console.log('No such document!!');
+        }
       }
-    }
 
-    setMusics(_music);
-  };
+      setMusics(_music);
+    },
+    [getFavorite, userFavId]
+  );
 
-  const getFavorite = async (_userFavId = userFavId) => {
-    try {
-      const querySnapshot = await getDocs(collection(db, _userFavId));
-      const _fav = [];
-      querySnapshot.forEach((doc) => {
-        _fav.push(doc.data().musicId);
-      });
-      return _fav;
-    } catch (e) {
-      console.error('Error adding document: ', e);
-      return [];
-    }
-  };
+  const getFavorite = useCallback(
+    async (_userFavId = userFavId) => {
+      try {
+        const querySnapshot = await getDocs(collection(db, _userFavId));
+        const _fav = [];
+        querySnapshot.forEach((doc) => {
+          _fav.push(doc.data().musicId);
+        });
+        return _fav;
+      } catch (e) {
+        console.error('Error adding document: ', e);
+        return [];
+      }
+    },
+    [userFavId]
+  );
 
   const removeFavorite = async (musicId, _userFavId = userFavId) => {
     try {
@@ -90,7 +97,7 @@ const Favorites = () => {
         router.push('/login');
       }
     });
-  }, []);
+  }, [getData, router]);
 
   return (
     <div className='custom-margin-padding flex flex-col min-h-screen items-center'>
