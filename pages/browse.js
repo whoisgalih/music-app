@@ -134,7 +134,7 @@ const Browse = () => {
                       musics[index].favorite = !musics[index].favorite;
                       addFavorite(music.id);
                     }}
-                    className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'custom-favorite-active' : ''}`}
+                    className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />
                 </div>
               </div>
