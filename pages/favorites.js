@@ -25,6 +25,23 @@ const Favorites = () => {
 
   const router = useRouter();
 
+  const getFavorite = useCallback(
+    async (_userFavId = userFavId) => {
+      try {
+        const querySnapshot = await getDocs(collection(db, _userFavId));
+        const _fav = [];
+        querySnapshot.forEach((doc) => {
+          _fav.push(doc.data().musicId);
+        });
+        return _fav;
+      } catch (e) {
+        console.error('Error adding document: ', e);
+        return [];
+      }
+    },
+    [userFavId]
+  );
+
   const getData = useCallback(
     async (_userFavId = userFavId) => {
       const fav = await getFavorite(_userFavId);
@@ -48,23 +65,6 @@ const Favorites = () => {
       setMusics(_music);
     },
     [getFavorite, userFavId]
-  );
-
-  const getFavorite = useCallback(
-    async (_userFavId = userFavId) => {
-      try {
-        const querySnapshot = await getDocs(collection(db, _userFavId));
-        const _fav = [];
-        querySnapshot.forEach((doc) => {
-          _fav.push(doc.data().musicId);
-        });
-        return _fav;
-      } catch (e) {
-        console.error('Error adding document: ', e);
-        return [];
-      }
-    },
-    [userFavId]
   );
 
   const removeFavorite = async (musicId, _userFavId = userFavId) => {
