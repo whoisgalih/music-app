@@ -9,7 +9,7 @@ const AppBar = ({ menus, active }) => {
 
   return (
     <>
-      <Popover className='sticky top-0 backdrop-blur-md bg-white/30 w-full z-10'>
+      <Popover className='sticky top-0 backdrop-blur-md bg-white/50 w-full z-10'>
         {/* Desktop App Bar */}
         <div className='custom-margin-padding '>
           <div className='flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10'>

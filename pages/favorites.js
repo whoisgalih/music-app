@@ -17,32 +17,32 @@ import { auth } from '../firebase';
 
 // db
 import { db } from '../firebase';
-import { addDoc, collection, deleteDoc, getDocs, doc } from 'firebase/firestore';
+import { collection, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
 
-const Browse = () => {
+const Favorites = () => {
   const [musics, setMusics] = useState([]);
   const [userFavId, setUserFavId] = useState('');
 
   const router = useRouter();
 
-  const getData = async (_userFavId = userFavId) => {
-    const querySnapshot = await getDocs(collection(db, 'musics'));
-    const _music = [];
-    querySnapshot.forEach((doc) => {
-      _music.push({
-        id: doc.id,
-        ...doc.data(),
-      });
-    });
-
+  const getData = async (_userFavId) => {
     const fav = await getFavorite(_userFavId);
-    fav.forEach((favMusic) => {
-      _music.forEach((music) => {
-        if (music.id === favMusic) {
-          music.favorite = true;
-        }
-      });
-    });
+
+    const _music = [];
+
+    for (let index = 0; index < fav.length; index++) {
+      const favMusic = fav[index];
+
+      const docSnap = await getDoc(doc(db, 'musics', favMusic));
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        _music.push({ id: favMusic, ...data, favorite: true });
+        // console.log('Document data:', data);
+      } else {
+        console.log('No such document!!');
+      }
+    }
 
     setMusics(_music);
   };
@@ -61,28 +61,17 @@ const Browse = () => {
     }
   };
 
-  const addFavorite = async (musicId, _userFavId = userFavId) => {
+  const removeFavorite = async (musicId, _userFavId = userFavId) => {
     try {
-      const favMusic = await getFavorite();
+      // find id and delete
+      const querySnapshot = await getDocs(collection(db, _userFavId));
 
-      // add to favorite if not exist
-      if (!favMusic.includes(musicId)) {
-        const docRef = await addDoc(collection(db, _userFavId), {
-          musicId,
-        });
-
-        // console.log('Document written with ID: ', docRef.id);
-      } else {
-        // find id and delete
-        const querySnapshot = await getDocs(collection(db, _userFavId));
-
-        querySnapshot.forEach((_doc) => {
-          if (_doc.data().musicId === musicId) {
-            deleteDoc(doc(db, _userFavId, _doc.id));
-            // console.log('Document deleted with ID: ', _doc.id);
-          }
-        });
-      }
+      querySnapshot.forEach((_doc) => {
+        if (_doc.data().musicId === musicId) {
+          deleteDoc(doc(db, _userFavId, _doc.id));
+          // console.log('Document deleted with ID: ', _doc.id);
+        }
+      });
 
       await getData();
     } catch (e) {
@@ -106,14 +95,14 @@ const Browse = () => {
   return (
     <div className='custom-margin-padding flex flex-col min-h-screen items-center'>
       <Head>
-        <title>Browse | Musically</title>
+        <title>Favorites | Musically</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <AppBar menus={menus} active='Browse' />
+      <AppBar menus={menus} active='Favorites' />
 
       <main className='w-full custom-margin-padding'>
-        <Hero title={'Browse'} />
+        <Hero title={'Favorites'} />
         <div className='border-b-2'>
           {musics.map((music) => {
             return (
@@ -124,7 +113,7 @@ const Browse = () => {
                     <h1>{music.artist}</h1>
                   </div>
                   <HeartIconOutline
-                    onClick={() => addFavorite(music.id)}
+                    onClick={() => removeFavorite(music.id)}
                     className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />
                 </div>
@@ -137,4 +126,4 @@ const Browse = () => {
   );
 };
 
-export default Browse;
+export default Favorites;
