@@ -8,7 +8,7 @@ import { HeartIcon as HeartIconOutline } from '@heroicons/react/outline';
 import Hero from '../components/hero';
 
 // react
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // auth
 import { useRouter } from 'next/router';
@@ -18,7 +18,6 @@ import { auth } from '../firebase';
 // db
 import { db } from '../firebase';
 import { collection, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
-import { useCallback } from 'react/cjs/react.production.min';
 
 const Favorites = () => {
   const [musics, setMusics] = useState([]);
