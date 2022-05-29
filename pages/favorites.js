@@ -120,10 +120,11 @@ const Favorites = () => {
                   </div>
                   <HeartIconOutline
                     onClick={() => {
-                      removeFavorite(music.id);
+                      const id = music.id;
                       const _musics = musics;
                       _musics.splice(index, 1);
                       setMusics(_musics);
+                      removeFavorite(id);
                     }}
                     className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />
