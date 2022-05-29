@@ -131,8 +131,10 @@ const Browse = () => {
                   </div>
                   <HeartIconOutline
                     onClick={() => {
-                      musics[index].favorite = !musics[index].favorite;
                       addFavorite(music.id);
+                      const _musics = musics;
+                      _musics[index].favorite = !_musics[index].favorite;
+                      setMusics(_musics);
                     }}
                     className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />

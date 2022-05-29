@@ -110,7 +110,7 @@ const Favorites = () => {
       <main className='w-full custom-margin-padding'>
         <Hero title={'Favorites'} />
         <div className='border-b-2'>
-          {musics.map((music) => {
+          {musics.map((music, index) => {
             return (
               <div key={music.id} className='py-4 border-t-2'>
                 <div className='flex items-center justify-between'>
@@ -119,7 +119,12 @@ const Favorites = () => {
                     <h1>{music.artist}</h1>
                   </div>
                   <HeartIconOutline
-                    onClick={() => removeFavorite(music.id)}
+                    onClick={() => {
+                      removeFavorite(music.id);
+                      const _musics = musics;
+                      _musics.splice(index, 1);
+                      setMusics(_musics);
+                    }}
                     className={`inline-block h-6 w-6 hover:fill-gray-600 stroke-gray-600 ${music.favorite ? 'fill-indigo-600 stroke-indigo-600 hover:fill-indigo-800 hover:stroke-indigo-800' : ''}`}
                   />
                 </div>
